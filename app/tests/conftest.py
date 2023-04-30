@@ -11,13 +11,16 @@ from src.enums.enums import RequestTypes
 load_dotenv(env_file)
 
 
+URL_TEST: str = "http://jsonplaceholder.typicode.com/posts"
+
+
 @pytest.fixture
 def payload_aiohttp() -> dict[str, str | dict]:
     return {
         "supplier": "string",
         "request_data": {
             "method": "GET",
-            "url": "http://localhost:8100/api/transceiver",
+            "url": URL_TEST,
             "headers": {},
             "data": {1: 2, 2: 3},
             "timeout": 25
@@ -32,7 +35,7 @@ def payload_requests() -> dict[str, str | dict]:
         "supplier": "string",
         "request_data": {
             "method": "GET",
-            "url": "http://localhost:8100/api/transceiver",
+            "url": URL_TEST,
             "headers": {},
             "data": {1: 2, 2: 3},
             "timeout": 25
