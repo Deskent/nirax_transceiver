@@ -6,7 +6,7 @@ env:
   VERSION: ${{ github.sha }}
   REGISTRY_SERVER: "94.103.93.84:5055"
   REPOSITORY: "nirax"
-  WORKDIR: "app"
+  APP_DIR: "app"
   SERVER_PATH: "/home/deskent/deploy/nirax_transceiver"
 
 on:
@@ -67,12 +67,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest
-          if [ -f ${{ env.WORKDIR }}/requirements.txt ]; then pip install -r ${{ env.WORKDIR }}/requirements.txt; fi
+          if [ -f ${{ env.APP_DIR }}/requirements.txt ]; then pip install -r ${{ env.APP_DIR }}/requirements.txt; fi
 
       - name: Test with pytest
         run: |
-          ls -la
-          cd ${{ env.WORKDIR }} \
+          cd ${{ env.APP_DIR }} \
+          && ls -la \
           && python -m pytest -rf --maxfail=3 -k "github" ./tests
 
       - name: Telegram notification on Failure
@@ -116,7 +116,7 @@ jobs:
         run: |
           echo '{"insecure-registries": ["94.103.93.84:5055"]}' >> daemon.json && sudo cp daemon.json /etc/docker/ \
           && sudo systemctl restart docker \
-          && cd ${{ env.WORKDIR }} \
+          && cd ${{ env.APP_DIR }} \
           && docker build -t ${{ env.PROJECT_NAME }}:${{ env.VERSION}} .
           docker image tag ${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
           docker push ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
