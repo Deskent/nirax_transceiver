@@ -3,6 +3,7 @@ version: "3.7"
 services:
   backend:
     image: ${REGISTRY_HOST}:${REGISTRY_PORT}/nirax/nirax_transceiver:latest
+    hostname: nirax_transceiver
     ports:
       - "${SERVER_PORT}:8000"
     extra_hosts:
