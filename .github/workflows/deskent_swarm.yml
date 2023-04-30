@@ -54,7 +54,6 @@ jobs:
       - name: Test with pytest
         run: |
           cd ${{ env.APP_DIR }} \
-          && ls -la \
           && python -m pytest -rf --maxfail=3 -k "github" ./tests
 
       - name: Telegram notification on Failure
@@ -96,7 +95,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Push to registry
         run: |
-          echo '{"insecure-registries": ["94.103.93.84:5055"]}' >> daemon.json && sudo cp daemon.json /etc/docker/ \
+          echo '{"insecure-registries": ["${{ env.REGISTRY_SERVER }}"]}' >> daemon.json && sudo cp daemon.json /etc/docker/ \
           && sudo systemctl restart docker \
           && cd ${{ env.APP_DIR }} \
           && docker build -t ${{ env.PROJECT_NAME }}:${{ env.VERSION}} .
