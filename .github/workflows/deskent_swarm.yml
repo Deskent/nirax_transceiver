@@ -21,24 +21,6 @@ jobs:
       matrix:
         python-version: ["3.10"]
 
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-      mongo:
-        image: mongo
-        env:
-          MONGO_INITDB_ROOT_USERNAME: 'test'
-          MONGO_INITDB_ROOT_PASSWORD: 'test'
-        ports:
-          - 27017:27017
-
     steps:
       - uses: actions/checkout@v3
       - name: Send message using curl
