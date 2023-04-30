@@ -151,7 +151,8 @@ jobs:
           && git checkout ${{ env.BRANCH }} \
           && git pull \
           && export $(cat .swarm.${{ env.STAGE }}.env) \
-          && docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.STAGE }}_${{ env.PROJECT_NAME }}
+          && docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.PROJECT_NAME }}_${{ env.STAGE }} \
+          && docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.PROJECT_NAME }}_${{ env.STAGE }}_${{ env.PROJECT_NAME }}
 
     - uses: actions/checkout@v3
 
