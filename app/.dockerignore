@@ -1,0 +1,6 @@
+*.
+Dockerfile
+*.sh
+README.md
+**logs
+**spam

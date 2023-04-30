@@ -1,0 +1,14 @@
+version: '3.10'
+
+services:
+
+  backend:
+    build: ..
+    container_name: nirax_transceiver
+    env_file:
+      - ./app/.env
+    ports:
+      - ${SERVER_PORT}:8000
+    volumes:
+      - ./app/logs:/app/logs
+    restart: on-failure

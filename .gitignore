@@ -1,0 +1,7 @@
+.env
+.editorconfig
+start.sh
+**spam
+.pytest_cache
+.idea
+/venv
