@@ -35,7 +35,6 @@ if not settings.LOGS_DIR:
     current_date = str(datetime.datetime.today().date())
     settings.LOGS_DIR = BASE_DIR / 'logs' / current_date
 
-settings.LOGS_DIR.mkdir(exist_ok=True)
 log_level = settings.LOGGER_LEVEL
 logger.remove()
 logger.add(level=log_level, sink=sys.stdout)
