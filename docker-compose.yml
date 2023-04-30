@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   backend:
-    build: .
+    build: ./app
     container_name: nirax_transceiver
     env_file:
       - ./app/.env
