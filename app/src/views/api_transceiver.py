@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 
-from config import settings
+from config import settings, logger
 from src.classes.requesters import MainRequester
 from src.schemas.schemas import InputSchema, OutputSchema
 
@@ -18,6 +18,17 @@ async def check_endpoint():
 
     answer = OutputSchema(message='OK')
     return answer
+
+
+@router.get(
+    "/healthcheck",
+    status_code=status.HTTP_200_OK,
+    include_in_schema=settings.DEBUG
+)
+async def healthcheck():
+    logger.debug(f"Checked")
+    return 0
+
 
 
 @router.post(

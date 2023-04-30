@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     BASE_DIR: Path = None
     LOGS_DIR: Path = None
-    SERVER_PORT: int = 8000
+    SERVER_PORT: int = 8100
     TELEBOT_TOKEN: str = ''
     CHAT_ID: int = -943224873
     STAGE: str = ""
@@ -21,11 +21,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = '/.env'
 
+
 # Main config
 BASE_DIR = Path(__file__).parent
 
 env_file = BASE_DIR / '.env'
-accounts_path = BASE_DIR / 'accounts.json'
 settings = Settings(_env_file=env_file, _env_file_encoding='utf-8')
 
 settings.BASE_DIR = BASE_DIR
@@ -37,6 +37,6 @@ if not settings.LOGS_DIR:
 
 log_level = settings.LOGGER_LEVEL
 logger.remove()
-logger.add(level=log_level, sink=settings.LOGS_DIR / 'nirax_transceiver.log', rotation='50 MB')
 logger.add(level=log_level, sink=sys.stdout)
 logger.add(level=30, sink=settings.LOGS_DIR / 'errors.log', rotation='100 MB')
+# logger.add(level=log_level, sink=settings.LOGS_DIR / 'nirax_transceiver.log', rotation='50 MB')

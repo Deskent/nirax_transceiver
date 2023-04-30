@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  backend:
+    image: ${REGISTRY_HOST}:${REGISTRY_PORT}/nirax/nirax_transceiver:latest
+    ports:
+      - "${SERVER_PORT}:8000"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    env_file:
+      - ./.env
+      - ./.swarm.dev.env
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8000/api/transceiver/healthcheck || exit 1
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      placement:
+        constraints:
+          - "node.labels.TAG==dev"
+      restart_policy:
+        condition: any

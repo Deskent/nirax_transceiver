@@ -5,7 +5,6 @@ import warnings
 
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from config import settings, logger
