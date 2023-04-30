@@ -6,7 +6,7 @@ env:
   VERSION: ${{ github.sha }}
   REGISTRY_SERVER: "94.103.93.84:5055"
   REPOSITORY: "nirax"
-  WORKDIR: "app"
+  WORKDIR: "."
   SERVER_PATH: "/home/deskent/deploy/nirax_transceiver"
 
 on:
