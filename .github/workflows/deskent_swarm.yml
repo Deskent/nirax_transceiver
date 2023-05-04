@@ -167,13 +167,13 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           docker pull \
-          ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ;\
-          && cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }} ;\
-          && git checkout ${{ env.BRANCH }} ;\
-          && git pull ;\
-          && export $(cat .swarm.${{ env.STAGE }}.env) ;\
-          && docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.SERVICE_NAME }}_${{ env.STAGE }} ;\
-          && docker service update --image \
+          ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
+          cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
+          git checkout ${{ env.BRANCH }}
+          git pull
+          export $(cat .swarm.${{ env.STAGE }}.env)
+          docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.SERVICE_NAME }}_${{ env.STAGE }}
+          docker service update --image \
           ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
           ${{ env.SERVICE_NAME }}_${{ env.STAGE }}_${{ env.SERVICE_NAME }}
 
