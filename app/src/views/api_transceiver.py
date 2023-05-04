@@ -4,8 +4,7 @@ from config import settings, logger
 from src.classes.requesters import MainRequester
 from src.schemas.schemas import InputSchema, OutputSchema
 
-include: bool = settings.DEBUG
-router = APIRouter(prefix='/transceiver', tags=['Transceiver'], include_in_schema=include)
+router = APIRouter(prefix='/transceiver', tags=['Transceiver'], include_in_schema=settings.DEBUG)
 
 
 @router.get(
@@ -32,9 +31,9 @@ async def healthcheck():
 
 
 @router.post(
-    "/aiohttp",
+    "/resend",
     status_code=status.HTTP_200_OK,
     response_model=OutputSchema
 )
-async def aiohttp_post(data: InputSchema):
+async def resend(data: InputSchema):
     return await MainRequester(data).run_request()

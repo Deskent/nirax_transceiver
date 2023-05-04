@@ -1,5 +1,5 @@
 import pytest
-URL = '/aiohttp'
+URL = '/resend'
 
 
 @pytest.mark.github

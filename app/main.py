@@ -9,6 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from config import settings, logger
 from routers import main_router
+from _resources import __appname__, __version__
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
@@ -17,13 +18,13 @@ if platform.system().lower() == "linux":
     time.tzset()
 
 description = f"""
-    Описание работы с API.
+    Описание работы с Transceiver.
 """
 APP_DESCRIPTION: dict = {
 
-    "title": "Nirax Transceiver",
+    "title": __appname__,
     "description": description,
-    "version": "2.0",
+    "version": __version__,
     "docs_url": settings.DOCS_URL,
     "redoc_url": settings.DOCS_URL,
     "debug": settings.DEBUG,
