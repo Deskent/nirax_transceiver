@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  nirax_transceiver:
+  transceiver:
     image: ${REGISTRY_HOST}:${REGISTRY_PORT}/nirax/nirax_transceiver:latest
     hostname: nirax_transceiver
     ports:

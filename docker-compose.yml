@@ -3,11 +3,11 @@ version: '3.7'
 services:
 
   backend:
-    build: ./app
+    build: transceiver
     image: ${REGISTRY_HOST}:${REGISTRY_PORT}/nirax/nirax_transceiver:latest
     container_name: nirax_transceiver
     env_file:
-      - ./app/.env
+      - transceiver/.env
       - ./.env
     ports:
       - ${SERVER_PORT}:8000
