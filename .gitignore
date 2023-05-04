@@ -5,3 +5,4 @@ start.sh
 .pytest_cache
 .idea
 /venv
+.swarm.*.env
