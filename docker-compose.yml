@@ -13,4 +13,4 @@ services:
       - ${SERVER_PORT}:8000
     volumes:
       - ./app/logs:/app/logs
-    restart: on-failure
+    restart: always

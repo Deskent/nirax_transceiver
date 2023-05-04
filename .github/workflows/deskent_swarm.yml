@@ -72,19 +72,6 @@ jobs:
 
       - name: Test with pytest
         run: |
-          export LOGIN_API=${{secrets.LOGIN_API}}
-          export PASSWORD_API=${{secrets.PASSWORD_API}}
-          export HOST_PROD_URL=${{secrets.HOST_PROD_URL}}
-          export ARMTEK_TEST_LOGIN=${{secrets.ARMTEK_TEST_LOGIN}}
-          export ARMTEK_TEST_PASSWORD=${{secrets.ARMTEK_TEST_PASSWORD}}
-          export BERG_API_KEY=${{secrets.BERG_API_KEY}}
-          export CARETTA_API_KEY=${{secrets.CARETTA_API_KEY}}
-          export MYSQL_HOST=${{secrets.MYSQL_HOST}}
-          export MYSQL_PORT=${{secrets.MYSQL_PORT}}
-          export MYSQL_USER=${{secrets.MYSQL_USER}}
-          export MYSQL_PASSWORD=${{secrets.MYSQL_PASSWORD}}
-          export MYSQL_DB_SYNONYMS=${{secrets.MYSQL_DB_SYNONYMS}}
-          export MYSQL_DB_CROSS=${{secrets.MYSQL_DB_CROSS}}
           cd ${{ env.WORKDIR }} \
           && python -m pytest -rf --maxfail=3 -k "github" ./tests
 
@@ -178,11 +165,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           docker pull ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
-          cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }} \
-          && git checkout ${{ env.BRANCH }} \
-          && git pull \
-          && export $(cat .swarm.${{ env.STAGE }}.env) \
-          && docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.STAGE }}_${{ env.SERVICE_NAME }}
+          docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.STAGE }}_${{ env.SERVICE_NAME }}
 
     - uses: actions/checkout@v3
 

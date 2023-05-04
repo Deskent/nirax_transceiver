@@ -4,7 +4,7 @@ import time
 import warnings
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from starlette.middleware.cors import CORSMiddleware
 
 from config import settings, logger
@@ -67,6 +67,15 @@ def get_application():
         logger.debug(f'Request [{request.url.path}] returns result after {delta} seconds.')
 
         return response
+
+    @app.get(
+        "/healthcheck",
+        status_code=status.HTTP_200_OK,
+        include_in_schema=settings.DEBUG
+    )
+    async def healthcheck():
+        logger.debug(f"Checked")
+        return 0
 
     return app
 
