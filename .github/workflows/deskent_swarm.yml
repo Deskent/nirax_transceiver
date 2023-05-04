@@ -1,18 +1,18 @@
-name: nirax_transceiver-deskent
+name: procenki-fastapi-deskent
 env:
   PROJECT_NAME: "nirax_transceiver"
   STAGE: "dev"
-  BRANCH: "main"
+  BRANCH: "deskent"
   VERSION: "latest"
-#  VERSION: ${{ github.sha }}
   REGISTRY_SERVER: "94.103.93.84:5055"
   REPOSITORY: "nirax"
-  APP_DIR: "app"
-  SERVER_PATH: "/home/deskent/deploy/nirax_transceiver"
+  WORKDIR: "app"
+  SERVICE_NAME: "transceiver"
+  DEPLOY_PATH: "/home/deskent/deploy"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ deskent1 ]
 
 jobs:
   tests_backend:
@@ -21,6 +21,24 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10"]
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+      mongo:
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: 'test'
+          MONGO_INITDB_ROOT_PASSWORD: 'test'
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v3
@@ -50,11 +68,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest
-          if [ -f ${{ env.APP_DIR }}/requirements.txt ]; then pip install -r ${{ env.APP_DIR }}/requirements.txt; fi
+          if [ -f ${{ env.WORKDIR }}/requirements.txt ]; then pip install -r ${{ env.WORKDIR }}/requirements.txt; fi
 
       - name: Test with pytest
         run: |
-          cd ${{ env.APP_DIR }} \
+          export LOGIN_API=${{secrets.LOGIN_API}}
+          export PASSWORD_API=${{secrets.PASSWORD_API}}
+          export HOST_PROD_URL=${{secrets.HOST_PROD_URL}}
+          export ARMTEK_TEST_LOGIN=${{secrets.ARMTEK_TEST_LOGIN}}
+          export ARMTEK_TEST_PASSWORD=${{secrets.ARMTEK_TEST_PASSWORD}}
+          export BERG_API_KEY=${{secrets.BERG_API_KEY}}
+          export CARETTA_API_KEY=${{secrets.CARETTA_API_KEY}}
+          export MYSQL_HOST=${{secrets.MYSQL_HOST}}
+          export MYSQL_PORT=${{secrets.MYSQL_PORT}}
+          export MYSQL_USER=${{secrets.MYSQL_USER}}
+          export MYSQL_PASSWORD=${{secrets.MYSQL_PASSWORD}}
+          export MYSQL_DB_SYNONYMS=${{secrets.MYSQL_DB_SYNONYMS}}
+          export MYSQL_DB_CROSS=${{secrets.MYSQL_DB_CROSS}}
+          cd ${{ env.WORKDIR }} \
           && python -m pytest -rf --maxfail=3 -k "github" ./tests
 
       - name: Telegram notification on Failure
@@ -96,9 +127,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Push to registry
         run: |
-          echo '{"insecure-registries": ["${{ env.REGISTRY_SERVER }}"]}' >> daemon.json && sudo cp daemon.json /etc/docker/ \
+          echo '{"insecure-registries": ["94.103.93.84:5055"]}' >> daemon.json && sudo cp daemon.json /etc/docker/ \
           && sudo systemctl restart docker \
-          && cd ${{ env.APP_DIR }} \
+          && cd ${{ env.WORKDIR }} \
           && docker build -t ${{ env.PROJECT_NAME }}:${{ env.VERSION}} .
           docker image tag ${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
           docker push ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
@@ -147,12 +178,11 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           docker pull ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
-          cd ${{ env.SERVER_PATH }} \
+          cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }} \
           && git checkout ${{ env.BRANCH }} \
           && git pull \
           && export $(cat .swarm.${{ env.STAGE }}.env) \
-          && docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.PROJECT_NAME }}_${{ env.STAGE }} \
-          && docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.PROJECT_NAME }}_${{ env.STAGE }}_${{ env.PROJECT_NAME }}
+          && docker service update --image ${{ env.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} ${{ env.STAGE }}_${{ env.SERVICE_NAME }}
 
     - uses: actions/checkout@v3
 
