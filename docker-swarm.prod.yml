@@ -30,6 +30,6 @@ services:
         order: stop-first
       placement:
         constraints:
-          - "node.labels.TAG==dev"
+          - "node.labels.TAG==prod"
       restart_policy:
         condition: any
