@@ -123,6 +123,26 @@ class AsyncRequester(BaseRequester):
         return await self._get_async_request_json()
 
 
+class RequestSession(BaseRequester):
+
+    def _get_request_json(self) -> dict:
+
+        session = requests.session()
+        session.headers = self.payload['headers']
+
+        response = session.request(
+            method=self.payload['method'],
+            url=self.payload['url'],
+            data=self.payload['data'],
+            verify=False,
+        )
+
+        return {'status': response.status_code, 'content': response.content}
+
+    async def send_request(self) -> dict:
+        return self._get_request_json()
+
+
 class MainRequester:
     def __init__(self, data: InputSchema):
         self.data: InputSchema = data
@@ -132,13 +152,17 @@ class MainRequester:
         payload: dict = self.data.request_data.dict()
         requests_types: dict = {
             RequestTypes.aiohttp.value: AsyncRequester,
-            RequestTypes.requests.value: SyncRequester
+            RequestTypes.requests.value: SyncRequester,
+            RequestTypes.session.value: RequestSession,
         }
         worker: Type[BaseRequester] = requests_types[self.data.request_type]
         try:
             self.output_data.data = await worker(payload).send_request()
             self.output_data.result = True
         except DataRequestError as err:
+            logger.exception(err)
+            self.output_data.message = f'{err}'
+        except Exception as err:
             logger.exception(err)
             self.output_data.message = f'{err}'
 
