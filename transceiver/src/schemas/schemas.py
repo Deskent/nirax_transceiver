@@ -16,8 +16,6 @@ class RequestData(BaseModel):
 
         data: dict = {}
 
-        string_data: str = ''
-
         timeout: int = 25
     """
 
@@ -25,8 +23,7 @@ class RequestData(BaseModel):
     url: str
     params: dict = {}
     headers: dict = {}
-    data: dict = {}
-    string_data: str = ''
+    data: dict | str = {}
     timeout: int = 25
 
 
