@@ -36,6 +36,8 @@ class SyncRequester(BaseRequester):
 
             url: str - URL куда отправлять запрос
 
+            params: dict - Query params
+
             headers: dict - Заголовки запроса
 
             data: dict - Тело запроса
@@ -89,6 +91,8 @@ class AsyncRequester(BaseRequester):
             method: str - HTTP-метод, GET, POST, DELETE, PUT, PATCH, etc
 
             url: str - URL куда отправлять запрос
+
+            params: dict - Query params
 
             headers: dict - Заголовки запроса
 
