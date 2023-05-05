@@ -133,10 +133,10 @@ class RequestSession(BaseRequester):
         response = session.request(
             method=self.payload['method'],
             url=self.payload['url'],
-            data=self.payload['data'],
+            data=self.payload['data'].encode('utf-8'),
             verify=False,
         )
-
+        logger.debug(response.status_code, response.content)
         return {'status': response.status_code, 'content': response.content}
 
     async def send_request(self) -> dict:
