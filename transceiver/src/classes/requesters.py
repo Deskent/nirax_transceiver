@@ -133,7 +133,7 @@ class RequestSession(BaseRequester):
         response = session.request(
             method=self.payload['method'],
             url=self.payload['url'],
-            data=self.payload['data'].encode('utf-8'),
+            data=self.payload['string_data'].encode('utf-8'),
             verify=False,
         )
         logger.debug(response.status_code, response.content)

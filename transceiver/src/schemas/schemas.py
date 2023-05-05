@@ -16,6 +16,8 @@ class RequestData(BaseModel):
 
         data: dict = {}
 
+        string_data: str = ''
+
         timeout: int = 25
     """
 
@@ -24,6 +26,7 @@ class RequestData(BaseModel):
     params: dict = {}
     headers: dict = {}
     data: dict = {}
+    string_data: str = ''
     timeout: int = 25
 
 
