@@ -8,7 +8,7 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     env_file:
-      - ./.swarm.dev.env
+      - ./.swarm.prod.env
     volumes:
       - ./logs:/app/logs
     healthcheck:
@@ -29,6 +29,6 @@ services:
         order: stop-first
       placement:
         constraints:
-          - "node.labels.TAG==dev"
+          - "node.labels.TAG==prod"
       restart_policy:
         condition: any
