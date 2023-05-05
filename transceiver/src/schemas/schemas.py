@@ -2,17 +2,53 @@ from pydantic import BaseModel
 
 
 class RequestData(BaseModel):
+    """Transceiver payload data
+
+    Attributes:
+
+        method: str
+
+        url: str
+
+        params: dict = {}
+
+        headers: dict = {}
+
+        data: dict = {}
+
+        timeout: int = 25
+    """
+
     method: str
     url: str
-    headers: dict
+    params: dict = {}
+    headers: dict = {}
     data: dict = {}
     timeout: int = 25
 
 
 class InputSchema(BaseModel):
     """
-    Attributes:
+    Transceiver input data
 
+    Attributes:
+        method: str
+
+        url: str
+
+        params: dict = {}
+
+        headers: dict = {}
+
+        data: dict = {}
+
+        timeout: int = 25
+
+        supplier: str
+
+        request_data: RequestData
+
+        request_type: str = 'aiohttp'
     """
 
     supplier: str
