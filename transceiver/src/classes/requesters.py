@@ -105,7 +105,7 @@ class AsyncRequester(BaseRequester):
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.request(**self.payload) as response:
+                async with session.request(**self.payload, ssl=False) as response:
                     status: int = response.status
                     return await response.json()
         except aiohttp.client_exceptions.ContentTypeError as err:
