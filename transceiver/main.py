@@ -74,8 +74,7 @@ def get_application():
         include_in_schema=settings.DEBUG
     )
     async def healthcheck():
-        logger.debug(f"Checked")
-        return 0
+        return __appname__
 
     return app
 
