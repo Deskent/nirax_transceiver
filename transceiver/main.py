@@ -59,15 +59,6 @@ def get_application():
     async def on_startup():
         pass
 
-    @app.middleware("http")
-    async def request_logger(request: Request, call_next):
-        t0 = time.time()
-        response = await call_next(request)
-        delta = round((time.time() - t0), 2)
-        logger.debug(f'Request [{request.url.path}] returns result after {delta} seconds.')
-
-        return response
-
     @app.get(
         "/healthcheck",
         status_code=status.HTTP_200_OK,
