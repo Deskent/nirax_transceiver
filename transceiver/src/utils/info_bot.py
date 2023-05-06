@@ -4,6 +4,7 @@ import requests
 from requests import Response
 
 from config import logger, settings
+from _resources import __appname__
 
 
 class Bot:
@@ -23,7 +24,7 @@ class Bot:
         headers: dict = {'Content-Type': 'application/json'}
         data: dict = {
             'chat_id': self.chat_id,
-            'text': message,
+            'text': f'[{__appname__}]: {message}',
             'parse_mode': self.parse_mode
         }
         logger.debug(f'Sending message via info bot... Data:\n\t{data}')
