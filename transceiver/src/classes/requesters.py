@@ -10,6 +10,7 @@ from src.enums.enums import RequestTypes
 from src.exc.exceptions import DataRequestError
 from src.schemas.schemas import InputSchema, OutputSchema
 from src.types.common import JSON
+from src.utils.info_bot import bot
 
 
 class BaseRequester:
@@ -164,6 +165,7 @@ class MainRequester:
             self.output_data.message = f'{err}'
         except Exception as err:
             logger.exception(err)
+            bot.send_message(f'[Transceiver]: Main requester get Error: {err}')
             self.output_data.message = f'{err}'
 
         return self.output_data
