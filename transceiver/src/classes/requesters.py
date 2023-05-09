@@ -67,14 +67,16 @@ class SyncRequester(BaseRequester):
                 raise DataRequestError(
                     f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
                 )
-        except requests.exceptions.ReadTimeout as err:
+        except (
+                requests.exceptions.ReadTimeout,
+                requests.exceptions.ConnectTimeout,
+        ) as err:
             logger.error(
-                f'SyncRequester._get_request_json ReadTimeout error: {err}'
+                f'SyncRequester._get_request_json {err.__class__.__name__} error: {err}'
                 f'\nPayload: {self.payload}'
             )
-            raise DataRequestError(
-                f'Timeout error: {self.timeout}'
-            )
+            raise DataRequestError(f'Timeout error: {self.timeout}')
+
         except requests.exceptions.MissingSchema as err:
             logger.exception(err)
             raise DataRequestError(
