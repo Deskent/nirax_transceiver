@@ -165,9 +165,13 @@ class MainRequester:
             self.output_data.message = f'{err}'
         except Exception as err:
             logger.exception(err)
-            bot.send_message(f'Main requester get Error: {self.data.request_data.url}')
-            bot.send_message(f'Main requester get Error: {err.__class__.__name__}')
-            bot.send_message(f'Main requester get Error: {str(err)}')
+            bot.send_message(
+                f'\nMain requester get Error:'
+                f'\nSupplier: {self.data.supplier}'
+                f'\nURL: {self.data.request_data.url}'
+                f'\nError Type: {err.__class__.__name__}'
+            )
+            bot.send_message(f'Main requester get Error Text: {str(err)}')
             self.output_data.message = f'{err}'
 
         return self.output_data
