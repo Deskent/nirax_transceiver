@@ -24,9 +24,11 @@ class RequestsRequester(BaseRequester):
 
             timeout: int - Таймаут ожидания ответа
 
+            ssl_verify: bool = False
+
         :return: Возвращает Response
         """
-
+        self.payload.update(verify=self.ssl_verify)
         return requests.request(**self.payload)
 
     def _get_request_json(self) -> JSON:
@@ -39,8 +41,8 @@ class RequestsRequester(BaseRequester):
                 return data
             except json.decoder.JSONDecodeError as err:
                 logger.error(
-                    f'SyncRequester._get_request_json JSON error: {err}'
-                    f'\nResponse text: {response.text}'
+                    f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
+                    f'\n{response.text=}'
                     f'\nPayload: {self.payload}'
                 )
                 raise DataRequestError(
@@ -51,13 +53,17 @@ class RequestsRequester(BaseRequester):
                 requests.exceptions.ConnectTimeout,
         ) as err:
             logger.error(
-                f'SyncRequester._get_request_json {err.__class__.__name__} error: {err}'
+                f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\nPayload: {self.payload}'
             )
             raise DataRequestError(f'Timeout error: {self.timeout}')
 
         except requests.exceptions.MissingSchema as err:
             logger.exception(err)
+            logger.error(
+                f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
+                f'\nPayload: {self.payload}'
+            )
             raise DataRequestError(
                 f'Invalid url: {self.payload["url"]}'
             )

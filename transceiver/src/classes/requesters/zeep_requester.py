@@ -2,6 +2,7 @@ from src.classes.requesters.base_requester import BaseRequester
 
 
 class ZeepRequester(BaseRequester):
+    """Class realize request using zeep library"""
 
     def _get_request_json(self) -> dict:
         pass
