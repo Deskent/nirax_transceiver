@@ -18,6 +18,7 @@ class Bot:
         self.timeout: int = timeout
         self.parse_mode: str = parse_mode
 
+    @logger.catch
     def send_message(self, message: str) -> Response:
         """Send message through Telegram bot"""
 
@@ -30,6 +31,7 @@ class Bot:
         logger.debug(f'Sending message via info bot... Data:\n\t{data}')
         return self._send_api_request('sendMessage', headers=headers, json=data)
 
+    @logger.catch
     def send_document(self, files: Iterable, caption: str | None = None) -> Response:
         """Send file as Telegram document"""
 
@@ -41,6 +43,7 @@ class Bot:
         logger.debug(f'Sending document via info bot... Data:\n\t{data}')
         return self._send_api_request('sendDocument', headers={}, data=data, files=files)
 
+    @logger.catch
     def _send_api_request(self, api_method: str, headers: dict, *_, **kwargs) -> Response:
         url: str = f'https://{self._API_HOST}/bot{self._token}/{api_method}'
         logger.debug(f'Sending request to Telegram Bot API: {api_method=}, {headers=}, {kwargs=}')

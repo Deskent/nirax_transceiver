@@ -32,23 +32,12 @@ class InputSchema(BaseModel):
     Transceiver input data
 
     Attributes:
-        method: str
 
-        url: str
+        supplier: str - Поставщик
 
-        params: dict = {}
+        request_data: RequestData - Данные для отправки запроса
 
-        headers: dict = {}
-
-        data: dict = {}
-
-        timeout: int = 25
-
-        supplier: str
-
-        request_data: RequestData
-
-        request_type: str = 'aiohttp'
+        request_type: str = 'aiohttp' - Тип запроса
     """
 
     supplier: str
