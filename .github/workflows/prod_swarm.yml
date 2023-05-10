@@ -3,7 +3,7 @@ env:
   PROJECT_NAME: "nirax_transceiver"
   STAGE: "prod"
   BRANCH: "main"
-  VERSION: ${{ github.sha }}
+  VERSION: 'latest'
   REGISTRY_SERVER: "94.103.93.84:5055"
   REPOSITORY: "nirax"
   WORKDIR: "transceiver"
