@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import Type
 
@@ -127,6 +128,7 @@ class AsyncRequester(BaseRequester):
 
 
 class RequestSession(BaseRequester):
+    """Class realize requests with session"""
 
     def _get_request_json(self) -> dict:
 
@@ -150,6 +152,8 @@ class MainRequester:
     def __init__(self, data: InputSchema):
         self.data: InputSchema = data
         self.output_data: OutputSchema = OutputSchema()
+        self.timeout: int = self.data.request_data.timeout
+        self.supplier: str = self.data.supplier
 
     async def run_request(self):
         payload: dict = self.data.request_data.dict()
@@ -165,15 +169,19 @@ class MainRequester:
         except DataRequestError as err:
             logger.exception(err)
             self.output_data.message = f'{err}'
+        except asyncio.exceptions.TimeoutError as err:
+            logger.exception(err)
+            self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
+
         except Exception as err:
             logger.exception(err)
             bot.send_message(
                 f'\nMain requester get Error:'
-                f'\nSupplier: {self.data.supplier}'
+                f'\nSupplier: {self.supplier}'
                 f'\nURL: {self.data.request_data.url}'
                 f'\nError Type: {err.__class__.__name__}'
             )
             bot.send_message(f'Main requester get Error Text: {str(err)}')
-            self.output_data.message = f'{err}'
+            self.output_data.message = 'Ошибка запроса к поставщику'
 
         return self.output_data
