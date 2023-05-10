@@ -166,12 +166,18 @@ class MainRequester:
         try:
             self.output_data.data = await worker(payload).send_request()
             self.output_data.result = True
+
         except DataRequestError as err:
             logger.exception(err)
             self.output_data.message = f'{err}'
+
         except asyncio.exceptions.TimeoutError as err:
             logger.exception(err)
             self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
+
+        except requests.exceptions.ConnectionError as err:
+            logger.exception(err)
+            self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
 
         except Exception as err:
             logger.exception(err)
