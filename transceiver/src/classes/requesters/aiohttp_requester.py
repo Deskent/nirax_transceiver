@@ -7,6 +7,7 @@ from src.types.common import JSON
 
 
 class AsyncRequester(BaseRequester):
+    """Class realize request using aiohttp library"""
 
     async def _get_async_request_json(self) -> JSON:
         """Принимает следующие ключи:
