@@ -24,7 +24,7 @@ def test_aiohttp_route_bad_url(tclient, base_url, payload_aiohttp):
     assert response.status_code == 200
     data: dict = response.json()
     assert data['message'].startswith('Invalid url')
-    assert data['errors'] == []
+    assert data['errors'] != []
     assert data['result'] is False
 
 
@@ -50,5 +50,5 @@ def test_requests_route_bad_url(tclient, base_url, payload_requests):
     assert response.status_code == 200
     data: dict = response.json()
     assert data['message'].startswith('Invalid url')
-    assert data['errors'] == []
+    assert data['errors'] != []
     assert data['result'] is False

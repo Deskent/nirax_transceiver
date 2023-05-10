@@ -37,6 +37,7 @@ class MainRequester:
                 ssl_verify=self.data.ssl_verify
             ).send_request()
             self.output_data.result = True
+            return self.output_data
 
         except DataRequestError as err:
             logger.exception(err)
@@ -60,5 +61,6 @@ class MainRequester:
             )
             bot.send_message(f'Main requester get Error Text: {str(err)}')
             self.output_data.message = 'Ошибка запроса к поставщику'
+
         self.output_data.errors.append({self.supplier: self.data.request_data})
         return self.output_data
