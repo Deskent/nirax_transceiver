@@ -9,45 +9,46 @@ from src.types.common import JSON
 
 
 class RequestsRequester(BaseRequester):
+    """Класс для запросов с помощью библиотеки requests"""
 
-    def _get_response(self) -> requests.Response:
-        """Принимает следующие ключи:
-            method: str - HTTP-метод, GET, POST, DELETE, PUT, PATCH, etc
+    def _get_request_json(self) -> tuple[int, JSON]:
+        """Отправляет запрос с заданными параметрами.
+        Возвращает кортеж статуса и данных"""
 
-            url: str - URL куда отправлять запрос
-
-            params: dict - Query params
-
-            headers: dict - Заголовки запроса
-
-            data: dict - Тело запроса
-
-            timeout: int - Таймаут ожидания ответа
-
-            ssl_verify: bool = False
-
-        :return: Возвращает Response
-        """
         self.payload.update(verify=self.ssl_verify)
-        return requests.request(**self.payload)
+        response: requests.Response = requests.request(**self.payload)
+        status: int = response.status_code
+        data: JSON = response.json()
 
-    def _get_request_json(self) -> JSON:
+        return status, data
+
+    async def send_request(self) -> JSON:
+        """Возвращает результат запроса и обрабатывает ошибки"""
+
+        status: int = 0
         try:
-            response: requests.Response = self._get_response()
-            status: int = response.status_code
-            try:
-                data: JSON = response.json()
+            status, data = self._get_request_json()
+            return data
 
+        except requests.exceptions.ChunkedEncodingError as err:
+            logger.exception(err)
+            self.payload.update(stream=True)
+            try:
+                status, data = self._get_request_json()
                 return data
-            except json.decoder.JSONDecodeError as err:
-                logger.error(
-                    f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
-                    f'\n{response.text=}'
-                    f'\nPayload: {self.payload}'
-                )
-                raise DataRequestError(
-                    f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
-                )
+            except Exception as err:
+                logger.error(f'Error with stream: {err}')
+                raise DataRequestError('Ошибка запроса к поставщику: Stream')
+
+        except json.decoder.JSONDecodeError as err:
+            logger.error(
+                f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
+                f'\nPayload: {self.payload}'
+            )
+            raise DataRequestError(
+                f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
+            )
+
         except (
                 requests.exceptions.ReadTimeout,
                 requests.exceptions.ConnectTimeout,
@@ -67,6 +68,3 @@ class RequestsRequester(BaseRequester):
             raise DataRequestError(
                 f'Invalid url: {self.payload["url"]}'
             )
-
-    async def send_request(self):
-        return self._get_request_json()
