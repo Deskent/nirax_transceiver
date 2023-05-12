@@ -43,6 +43,7 @@ class InputSchema(BaseModel):
     supplier: str
     request_data: RequestData
     request_type: str = 'aiohttp'
+    ssl_verify: bool = None
 
 
 class OutputSchema(BaseModel):
