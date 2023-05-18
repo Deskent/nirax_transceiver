@@ -5,6 +5,7 @@ from loguru import logger
 from src.classes.requesters.base_requester import BaseRequester
 from src.exc import DataRequestError
 from src.types.common import JSON
+from src.utils.info_bot import bot
 
 
 class AsyncRequester(BaseRequester):
@@ -33,18 +34,20 @@ class AsyncRequester(BaseRequester):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.request(**self.payload, ssl=ssl) as response:
-                    status: int = response.status
                     return await response.json()
+
         except aiohttp.client_exceptions.ContentTypeError as err:
             logger.exception(err)
-            logger.error(
+            text: str = (
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\nPayload: {self.payload}'
             )
+            logger.error(text)
+            bot.send_message(text)
             raise DataRequestError(
-                f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
-
+                f'Ошибка ответа сервера поставщика: {err.__class__.__name__}'
             )
+
         except aiohttp.client_exceptions.InvalidURL as err:
             logger.exception(err)
             logger.error(
