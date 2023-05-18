@@ -1,6 +1,7 @@
 import asyncio
 from typing import Type
 
+import aiohttp.client_exceptions
 import requests
 
 from config import logger
@@ -50,6 +51,10 @@ class MainRequester:
         except requests.exceptions.ConnectionError as err:
             logger.exception(err)
             self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
+
+        except aiohttp.client_exceptions.ClientConnectorError as err:
+            logger.error(err)
+            self.output_data.message = 'Ошибка запроса к поставщику: слишком много запросов в данный момент'
 
         except Exception as err:
             logger.exception(err)
