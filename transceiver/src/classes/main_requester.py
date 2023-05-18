@@ -52,7 +52,10 @@ class MainRequester:
             logger.exception(err)
             self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
 
-        except aiohttp.client_exceptions.ClientConnectorError as err:
+        except (
+                aiohttp.client_exceptions.ClientConnectorError,
+                aiohttp.client_exceptions.ServerDisconnectedError,
+        )as err:
             logger.error(err)
             self.output_data.message = 'Ошибка запроса к поставщику: слишком много запросов в данный момент'
 
