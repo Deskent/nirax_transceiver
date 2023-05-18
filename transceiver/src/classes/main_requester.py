@@ -54,10 +54,9 @@ class MainRequester:
         except Exception as err:
             logger.exception(err)
             bot.send_message(
-                f'\nMain requester get Error:'
+                f'\nMain requester get error type: {err.__class__.__name__}'
                 f'\nSupplier: {self.supplier}'
                 f'\nURL: {self.data.request_data.url}'
-                f'\nError Type: {err.__class__.__name__}'
             )
             bot.send_message(f'Main requester get Error Text: {str(err)}')
             self.output_data.message = 'Ошибка запроса к поставщику'
