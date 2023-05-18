@@ -34,16 +34,21 @@ class AsyncRequester(BaseRequester):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.request(**self.payload, ssl=ssl) as response:
+                    status: int = response.status
+                    answer_text: str = await response.text()
                     return await response.json()
 
         except aiohttp.client_exceptions.ContentTypeError as err:
             logger.exception(err)
             text: str = (
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
+                f'\nStatus: {status}'
                 f'\nPayload: {self.payload}'
             )
             logger.error(text)
             bot.send_message(text)
+            bot.send_message(answer_text)
+
             raise DataRequestError(
                 f'Ошибка ответа сервера поставщика: {err.__class__.__name__}'
             )
