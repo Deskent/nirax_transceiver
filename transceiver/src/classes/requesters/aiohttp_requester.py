@@ -53,6 +53,12 @@ class AsyncRequester(BaseRequester):
                 f'Ошибка ответа сервера поставщика: {err.__class__.__name__}'
             )
 
+        except aiohttp.ClientOSError as err:
+            logger.exception(err)
+            raise DataRequestError(
+                f'Ошибка ответа сервера поставщика: {err.__class__.__name__}'
+            )
+
         except aiohttp.client_exceptions.InvalidURL as err:
             logger.exception(err)
             logger.error(
