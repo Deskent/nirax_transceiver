@@ -1,3 +1,5 @@
+import json
+
 import aiohttp
 import aiohttp.client_exceptions
 from loguru import logger
@@ -48,9 +50,14 @@ class AsyncRequester(BaseRequester):
             logger.error(text)
             bot.send_message(text)
             bot.send_message(answer_text)
+            try:
+                answer_text_json: dict = json.loads(answer_text)
+                error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
+            except Exception:
+                error_text: str = f'{err.__class__.__name__}'
 
             raise DataRequestError(
-                f'Ошибка ответа сервера поставщика: {err.__class__.__name__}'
+                f'Ошибка ответа сервера поставщика: {error_text}'
             )
 
         except aiohttp.ClientOSError as err:
