@@ -22,7 +22,9 @@ async def resend(data: InputSchema):
         return results
     except asyncio.exceptions.TimeoutError as err:
         logger.error(err)
-        return OutputSchema(message=f'Ошибка запроса к поставщику: Ошибка таймаута: {data.request_data.timeout}')
+        return OutputSchema(
+            message=f'Ошибка запроса к поставщику: Ошибка таймаута: {data.request_data.timeout}'
+        )
 
     except Exception as err:
         logger.exception(err)
