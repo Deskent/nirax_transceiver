@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, status
 
 from config import settings, logger
@@ -14,6 +16,14 @@ router = APIRouter(prefix='/transceiver', tags=['Transceiver'], include_in_schem
 )
 async def resend(data: InputSchema):
     logger.debug(data)
-    results = await MainRequester(data).run_request()
-    logger.debug(results)
-    return results
+    try:
+        results = await MainRequester(data).run_request()
+        logger.debug(results)
+        return results
+    except asyncio.exceptions.TimeoutError as err:
+        logger.error(err)
+        return OutputSchema(message=f'Ошибка запроса к поставщику: Ошибка таймаута: {data.request_data.timeout}')
+
+    except Exception as err:
+        logger.exception(err)
+    return OutputSchema(message='Ошибка запроса к поставщику: общая')
