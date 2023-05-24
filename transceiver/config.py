@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     CHAT_ID: int = -943224873
     STAGE: str = ""
     LOGGER_LEVEL: str = "INFO"
-    DEFAULT_TIMEOUT: int = 25
+    DEFAULT_TIMEOUT: int = 60
 
     class Config:
         env_file = '/.env'
