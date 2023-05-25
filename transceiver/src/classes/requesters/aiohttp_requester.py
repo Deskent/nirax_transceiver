@@ -41,19 +41,21 @@ class AsyncRequester(BaseRequester):
                     return await response.json()
 
         except aiohttp.client_exceptions.ContentTypeError as err:
-            logger.error(err)
             text: str = (
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\nStatus: {status}'
                 f'\nPayload: {self.payload}'
+                f'\n{err=}'
             )
             logger.error(text)
-            bot.send_message(text)
-            bot.send_message(answer_text)
+
             try:
                 answer_text_json: dict = json.loads(answer_text)
                 error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
+                logger.error(f'{error_text=}')
             except Exception:
+                bot.send_message(text)
+                bot.send_message(answer_text)
                 error_text: str = f'Тип ошибки: {err.__class__.__name__}'
 
             raise DataRequestError(
