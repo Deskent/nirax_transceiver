@@ -54,7 +54,7 @@ class AsyncRequester(BaseRequester):
                 answer_text_json: dict = json.loads(answer_text)
                 error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
             except Exception:
-                error_text: str = f'Статус код: {status}: Тип ошибки: {err.__class__.__name__}'
+                error_text: str = f'Тип ошибки: {err.__class__.__name__}'
 
             raise DataRequestError(
                 f'Ошибка ответа сервера поставщика: {error_text}'
@@ -63,7 +63,7 @@ class AsyncRequester(BaseRequester):
         except aiohttp.ClientOSError as err:
             logger.error(err)
             raise DataRequestError(
-                f'Ошибка ответа сервера поставщика: Статус код: {status}: Тип ошибки: {err.__class__.__name__}'
+                f'Ошибка ответа сервера поставщика: Тип ошибки: {err.__class__.__name__}'
             )
 
         except aiohttp.client_exceptions.InvalidURL as err:
