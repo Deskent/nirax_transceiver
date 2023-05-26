@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import requests
@@ -22,19 +23,24 @@ class RequestsRequester(BaseRequester):
 
         return status, data
 
+    async def _get_request_json_data(self) -> tuple[int, JSON]:
+        """Run sync request in async thread"""
+
+        return await asyncio.to_thread(self._get_request_json)
+
     async def send_request(self) -> JSON:
         """Возвращает результат запроса и обрабатывает ошибки"""
 
         status: int = 0
         try:
-            status, data = self._get_request_json()
+            status, data = await self._get_request_json_data()
             return data
 
         except requests.exceptions.ChunkedEncodingError as err:
             logger.exception(err)
             self.payload.update(stream=True)
             try:
-                status, data = self._get_request_json()
+                status, data = await self._get_request_json_data()
                 return data
             except Exception as err:
                 logger.error(f'Error with stream: {err}')
