@@ -1,4 +1,4 @@
-__build__ = '1.2'
-__version__ = '1.2.9'
+__build__ = '1.3'
+__version__ = '1.3.0'
 __author__ = 'Deskent'
 __appname__ = "Nirax Transceiver"
