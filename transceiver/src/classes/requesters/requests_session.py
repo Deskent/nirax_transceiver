@@ -1,8 +1,11 @@
+import asyncio
+
 import requests
 from loguru import logger
 
 from src.classes.requesters.base_requester import BaseRequester
 from src.exc import DataRequestError
+from src.types.common import JSON
 
 
 class RequestSession(BaseRequester):
@@ -31,5 +34,10 @@ class RequestSession(BaseRequester):
                 f'Error {err.__class__.__name__} {self.payload["url"]}'
             )
 
+    async def _get_request_json_data(self) -> JSON:
+        """Run sync request in async thread"""
+
+        return await asyncio.to_thread(self._get_request_json)
+
     async def send_request(self) -> dict:
-        return self._get_request_json()
+        return await self._get_request_json_data()
