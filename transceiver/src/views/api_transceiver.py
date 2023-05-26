@@ -15,10 +15,10 @@ router = APIRouter(prefix='/transceiver', tags=['Transceiver'], include_in_schem
     response_model=OutputSchema
 )
 async def resend(data: InputSchema):
-    logger.info(data)
+    logger.debug(data)
     try:
         results = await MainRequester(data).run_request()
-        logger.info(results)
+        logger.debug(results)
         return results
     except asyncio.exceptions.TimeoutError as err:
         logger.error(err)
