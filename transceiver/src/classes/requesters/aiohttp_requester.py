@@ -1,3 +1,5 @@
+import json
+
 import aiohttp
 import aiohttp.client_exceptions
 from loguru import logger
@@ -5,6 +7,7 @@ from loguru import logger
 from src.classes.requesters.base_requester import BaseRequester
 from src.exc import DataRequestError
 from src.types.common import JSON
+from src.utils.info_bot import bot
 
 
 class AsyncRequester(BaseRequester):
@@ -34,17 +37,37 @@ class AsyncRequester(BaseRequester):
             async with aiohttp.ClientSession() as session:
                 async with session.request(**self.payload, ssl=ssl) as response:
                     status: int = response.status
+                    answer_text: str = await response.text()
                     return await response.json()
-        except aiohttp.client_exceptions.ContentTypeError as err:
-            logger.exception(err)
-            logger.error(
-                f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
-                f'\nPayload: {self.payload}'
-            )
-            raise DataRequestError(
-                f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
 
+        except aiohttp.client_exceptions.ContentTypeError as err:
+            text: str = (
+                f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
+                f'\nStatus: {status}'
+                f'\nPayload: {self.payload}'
+                f'\n{err=}'
             )
+            logger.error(text)
+
+            try:
+                answer_text_json: dict = json.loads(answer_text)
+                error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
+                logger.error(f'{error_text=}')
+            except Exception:
+                bot.send_message(text)
+                bot.send_message(answer_text)
+                error_text: str = f'Тип ошибки: {err.__class__.__name__}'
+
+            raise DataRequestError(
+                f'Ошибка ответа сервера поставщика: {error_text}'
+            )
+
+        except aiohttp.ClientOSError as err:
+            logger.error(err)
+            raise DataRequestError(
+                f'Ошибка ответа сервера поставщика: Тип ошибки: {err.__class__.__name__}'
+            )
+
         except aiohttp.client_exceptions.InvalidURL as err:
             logger.exception(err)
             logger.error(
