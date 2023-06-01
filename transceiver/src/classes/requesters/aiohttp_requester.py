@@ -45,6 +45,7 @@ class AsyncRequester(BaseRequester):
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\n{status=}'
                 f'\n{self.payload=}'
+                f'\n{answer_text=}'
                 f'\n{err=}'
             )
             logger.error(text)
