@@ -54,7 +54,9 @@ class AsyncRequester(BaseRequester):
                 error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
                 logger.error(f'{error_text=}')
             except Exception:
-                bot.send_message(text)
+                bot.send_message(f'ContentTypeError:'
+                                 f'\n{self.payload=}'
+                                 f'\n{text=}')
                 bot.send_message(answer_text)
                 error_text: str = f'Тип ошибки: {err.__class__.__name__}'
 
