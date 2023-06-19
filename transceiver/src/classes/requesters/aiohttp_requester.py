@@ -43,8 +43,9 @@ class AsyncRequester(BaseRequester):
         except aiohttp.client_exceptions.ContentTypeError as err:
             text: str = (
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
-                f'\nStatus: {status}'
-                f'\nPayload: {self.payload}'
+                f'\n{status=}'
+                f'\n{self.payload=}'
+                f'\n{answer_text=}'
                 f'\n{err=}'
             )
             logger.error(text)
@@ -54,8 +55,10 @@ class AsyncRequester(BaseRequester):
                 error_text: str = answer_text_json.get('errors', {}).get('FaultDetail', f'{err.__class__.__name__}')
                 logger.error(f'{error_text=}')
             except Exception:
-                bot.send_message(text)
-                bot.send_message(answer_text)
+                bot.send_message(f'ContentTypeError:'
+                                 f'\n{self.payload=}'
+                                 f'\n{text=}')
+                bot.send_message(f'{answer_text=}')
                 error_text: str = f'Тип ошибки: {err.__class__.__name__}'
 
             raise DataRequestError(
