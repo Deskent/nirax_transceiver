@@ -52,7 +52,7 @@ class RequestsRequester(BaseRequester):
                 f'\nPayload: {self.payload}'
             )
             raise DataRequestError(
-                f'Ошибка {status} запроса запроса на адрес: {self.payload["url"]}'
+                f'Ошибка {status} декодирования запроса на адрес: {self.payload["url"]}'
             )
 
         except (
