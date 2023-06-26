@@ -10,19 +10,30 @@ from src.enums.enums import RequestTypes
 
 load_dotenv(env_file)
 
+# URL_TEST: str = "http://jsonplaceholder.typicode.com/posts"
+URL_TEST: str = "http://api.carreta.ru/v1/search"
 
-URL_TEST: str = "http://jsonplaceholder.typicode.com/posts"
+
+@pytest.fixture(scope='session')
+def carreta_api_key() -> str:
+    password: str = os.getenv('CARETTA_API_KEY')
+    if not password:
+        raise ValueError('Env error: CARETTA_API_KEY not found')
+    return password
 
 
 @pytest.fixture
-def payload_aiohttp() -> dict[str, str | dict]:
+def payload_aiohttp(carreta_api_key) -> dict[str, str | dict]:
     return {
-        "supplier": "string",
+        "supplier": "carreta.ru",
         "request_data": {
             "method": "GET",
             "url": URL_TEST,
             "headers": {},
-            "data": {1: 2, 2: 3},
+            "data": {
+                'api_key': carreta_api_key,
+                'q': '4477'
+            },
             "timeout": 25
         },
         "request_type": RequestTypes.aiohttp.value
@@ -30,14 +41,17 @@ def payload_aiohttp() -> dict[str, str | dict]:
 
 
 @pytest.fixture
-def payload_requests() -> dict[str, str | dict]:
+def payload_requests(carreta_api_key) -> dict[str, str | dict]:
     return {
-        "supplier": "string",
+        "supplier": "carreta.ru",
         "request_data": {
             "method": "GET",
             "url": URL_TEST,
             "headers": {},
-            "data": {1: 2, 2: 3},
+            "data": {
+                'api_key': carreta_api_key,
+                'q': '4477'
+            },
             "timeout": 25
         },
         "request_type": RequestTypes.requests.value

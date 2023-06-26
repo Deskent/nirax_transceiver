@@ -37,6 +37,8 @@ class MainRequester:
                 payload=payload,
                 ssl_verify=self.data.ssl_verify
             ).send_request()
+            if self.output_data.data is None:
+                self.output_data.data = {}
             self.output_data.result = True
             return self.output_data
 
