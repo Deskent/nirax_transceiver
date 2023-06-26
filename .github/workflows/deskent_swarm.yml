@@ -71,6 +71,7 @@ jobs:
 
       - name: Test with pytest
         run: |
+          export CARETTA_API_KEY=${{secrets.CARETTA_API_KEY}}
           cd ${{ env.WORKDIR }} \
           && python -m pytest -rf --maxfail=3 -k "github" ./tests
 
