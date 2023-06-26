@@ -61,8 +61,8 @@ class AsyncRequester(BaseRequester):
                 bot.send_message(f'{answer_text=}')
                 error_text: str = f'Тип ошибки: {err.__class__.__name__}'
 
-            if status:
-                error_text += f' Статус: {status}'
+                if status:
+                    error_text += f' Статус: {status}'
 
             raise DataRequestError(
                 f'Ошибка ответа сервера поставщика: {error_text}'
