@@ -10,7 +10,7 @@ class RequestData(BaseModel):
 
         url: str
 
-        params: dict = {}
+        params: dict | None = {}
 
         headers: dict = {}
 
@@ -21,7 +21,7 @@ class RequestData(BaseModel):
 
     method: str
     url: str
-    params: dict = {}
+    params: dict | None = {}
     headers: dict = {}
     data: dict | str = {}
     timeout: int = 25
