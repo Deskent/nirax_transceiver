@@ -58,6 +58,10 @@ class OutputSchema(BaseModel):
         errors: list = []
 
         data: list = []
+
+        status_code: int = 0
+
+        text: str = ''
     """
 
     result: bool = False
@@ -65,3 +69,5 @@ class OutputSchema(BaseModel):
     message: str = ''
     errors: list = []
     data: list | dict = {}
+    status_code: int = 0
+    text: str = ''

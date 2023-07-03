@@ -10,8 +10,8 @@ from src.enums.enums import RequestTypes
 
 load_dotenv(env_file)
 
-# URL_TEST: str = "http://jsonplaceholder.typicode.com/posts"
-URL_TEST: str = "http://api.carreta.ru/v1/search"
+URL_TEST: str = "http://jsonplaceholder.typicode.com/posts"
+# URL_TEST: str = "http://api.carreta.ru/v1/search"
 
 
 @pytest.fixture(scope='session')
@@ -23,17 +23,22 @@ def carreta_api_key() -> str:
 
 
 @pytest.fixture
-def payload_aiohttp(carreta_api_key) -> dict[str, str | dict]:
+def payload_data(carreta_api_key) -> dict[str, str | dict]:
+    return {
+        # 'api_key': carreta_api_key,
+        # 'q': '4477'
+    }
+
+
+@pytest.fixture
+def payload_aiohttp(payload_data) -> dict[str, str | dict]:
     return {
         "supplier": "carreta.ru",
         "request_data": {
             "method": "GET",
             "url": URL_TEST,
             "headers": {},
-            "data": {
-                'api_key': carreta_api_key,
-                'q': '4477'
-            },
+            "data": payload_data,
             "timeout": 25
         },
         "request_type": RequestTypes.aiohttp.value
@@ -41,17 +46,14 @@ def payload_aiohttp(carreta_api_key) -> dict[str, str | dict]:
 
 
 @pytest.fixture
-def payload_requests(carreta_api_key) -> dict[str, str | dict]:
+def payload_requests(payload_data) -> dict[str, str | dict]:
     return {
         "supplier": "carreta.ru",
         "request_data": {
             "method": "GET",
             "url": URL_TEST,
             "headers": {},
-            "data": {
-                'api_key': carreta_api_key,
-                'q': '4477'
-            },
+            "data": payload_data,
             "timeout": 25
         },
         "request_type": RequestTypes.requests.value
