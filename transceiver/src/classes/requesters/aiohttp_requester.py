@@ -38,7 +38,12 @@ class AsyncRequester(BaseRequester):
                 async with session.request(**self.payload, ssl=ssl) as response:
                     status: int = response.status
                     answer_text: str = await response.text()
-                    return await response.json()
+                    if status in (200, 300):
+                        return await response.json()
+                    return {
+                        'status_code': status,
+                        'text': answer_text
+                    }
 
         except aiohttp.client_exceptions.ContentTypeError as err:
             text: str = (

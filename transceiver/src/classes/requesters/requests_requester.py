@@ -12,18 +12,21 @@ from src.types.common import JSON
 class RequestsRequester(BaseRequester):
     """Класс для запросов с помощью библиотеки requests"""
 
-    def _get_request_json(self) -> tuple[int, JSON]:
+    def _get_request_json(self) -> JSON:
         """Отправляет запрос с заданными параметрами.
         Возвращает кортеж статуса и данных"""
 
         self.payload.update(verify=self.ssl_verify)
         response: requests.Response = requests.request(**self.payload)
         status: int = response.status_code
-        data: JSON = response.json()
+        if status in (200, 300):
+            return response.json()
+        return {
+            'status_code': status,
+            'text': response.text
+        }
 
-        return status, data
-
-    async def _get_request_json_data(self) -> tuple[int, JSON]:
+    async def _get_request_json_data(self) -> JSON:
         """Run sync request in async thread"""
 
         return await asyncio.to_thread(self._get_request_json)
@@ -31,17 +34,13 @@ class RequestsRequester(BaseRequester):
     async def send_request(self) -> JSON:
         """Возвращает результат запроса и обрабатывает ошибки"""
 
-        status: int = 0
         try:
-            status, data = await self._get_request_json_data()
-            return data
-
+            return await self._get_request_json_data()
         except requests.exceptions.ChunkedEncodingError as err:
-            logger.exception(err)
+            logger.error(err)
             self.payload.update(stream=True)
             try:
-                status, data = await self._get_request_json_data()
-                return data
+                return await self._get_request_json_data()
             except Exception as err:
                 logger.error(f'Error with stream: {err}')
                 raise DataRequestError('Ошибка запроса к поставщику: Stream')
@@ -52,7 +51,7 @@ class RequestsRequester(BaseRequester):
                 f'\nPayload: {self.payload}'
             )
             raise DataRequestError(
-                f'Ошибка {status} декодирования запроса на адрес: {self.payload["url"]}'
+                f'Ошибка декодирования запроса на адрес: {self.payload["url"]}'
             )
 
         except (
@@ -66,7 +65,6 @@ class RequestsRequester(BaseRequester):
             raise DataRequestError(f'Timeout error: {self.timeout}')
 
         except requests.exceptions.MissingSchema as err:
-            logger.exception(err)
             logger.error(
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\nPayload: {self.payload}'
