@@ -53,15 +53,15 @@ class MainRequester:
             return self.output_data
 
         except DataRequestError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = f'{err}'
 
         except asyncio.exceptions.TimeoutError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
 
         except requests.exceptions.ConnectionError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
 
         except (

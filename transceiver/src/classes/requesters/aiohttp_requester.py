@@ -80,7 +80,7 @@ class AsyncRequester(BaseRequester):
             )
 
         except aiohttp.client_exceptions.InvalidURL as err:
-            logger.exception(err)
+            logger.error(err)
             logger.error(
                 f'\n{self.__class__.__name__} error type: {err.__class__.__name__}:'
                 f'\nPayload: {self.payload}'
