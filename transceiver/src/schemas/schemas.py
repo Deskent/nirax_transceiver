@@ -10,7 +10,7 @@ class RequestData(BaseModel):
 
         url: str
 
-        params: dict = {}
+        params: dict | None = {}
 
         headers: dict = {}
 
@@ -21,7 +21,7 @@ class RequestData(BaseModel):
 
     method: str
     url: str
-    params: dict = {}
+    params: dict | None = {}
     headers: dict = {}
     data: dict | str = {}
     timeout: int = 25
@@ -58,6 +58,10 @@ class OutputSchema(BaseModel):
         errors: list = []
 
         data: list = []
+
+        status_code: int = 0
+
+        text: str = ''
     """
 
     result: bool = False
@@ -65,3 +69,5 @@ class OutputSchema(BaseModel):
     message: str = ''
     errors: list = []
     data: list | dict = {}
+    status_code: int = 0
+    text: str = ''

@@ -33,25 +33,35 @@ class MainRequester:
         }
         worker: Type[BaseRequester] = requests_types[self.data.request_type]
         try:
-            self.output_data.data = await worker(
+            answer: dict | list = await worker(
                 payload=payload,
                 ssl_verify=self.data.ssl_verify
             ).send_request()
-            if self.output_data.data is None:
-                self.output_data.data = {}
+
+            if isinstance(answer, dict) and (status := answer.get('status_code')):
+                self.output_data.status_code = status
+                self.output_data.text = answer.get('text')
+                self.output_data.message = (
+                    f'Ошибка запроса к поставщику {self.data.supplier}: Статус: {status}'
+                )
+
+                return self.output_data
+
+            self.output_data.data = answer if answer is not None else {}
             self.output_data.result = True
+
             return self.output_data
 
         except DataRequestError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = f'{err}'
 
         except asyncio.exceptions.TimeoutError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
 
         except requests.exceptions.ConnectionError as err:
-            logger.exception(err)
+            logger.error(err)
             self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
 
         except (
