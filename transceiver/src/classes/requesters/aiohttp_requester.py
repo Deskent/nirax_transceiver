@@ -18,7 +18,7 @@ class AsyncRequester(BaseRequester):
 
         form_data = aiohttp.FormData()
         for key, value in data.items():
-            if isinstance(value, str):
+            if isinstance(value, (str, int, float, bool)):
                 form_data.add_field(key, value)
             elif isinstance(value, list):
                 for index, order_item in enumerate(value):
