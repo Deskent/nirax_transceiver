@@ -35,7 +35,8 @@ class MainRequester:
         try:
             answer: dict | list = await worker(
                 payload=payload,
-                ssl_verify=self.data.ssl_verify
+                ssl_verify=self.data.ssl_verify,
+                create_form_data=self.data.create_form_data
             ).send_request()
 
             if isinstance(answer, dict) and (status := answer.get('status_code')):

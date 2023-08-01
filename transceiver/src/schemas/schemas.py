@@ -17,6 +17,8 @@ class RequestData(BaseModel):
         data: dict = {}
 
         timeout: int = 25
+
+
     """
 
     method: str
@@ -38,12 +40,17 @@ class InputSchema(BaseModel):
         request_data: RequestData - Данные для отправки запроса
 
         request_type: str = 'aiohttp' - Тип запроса
+
+        ssl_verify: bool = None
+
+        create_form_data: bool = False - Transceiver send data as aiohttp.FormData
     """
 
     supplier: str
     request_data: RequestData
     request_type: str = 'aiohttp'
     ssl_verify: bool = None
+    create_form_data: bool = False
 
 
 class OutputSchema(BaseModel):
