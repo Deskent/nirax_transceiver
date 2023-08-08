@@ -57,7 +57,10 @@ class MainRequester:
             logger.error(err)
             self.output_data.message = f'{err}'
 
-        except asyncio.exceptions.TimeoutError as err:
+        except (
+                asyncio.exceptions.TimeoutError,
+                aiohttp.client_exceptions.ClientPayloadError
+        ) as err:
             logger.error(err)
             self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
 
@@ -74,12 +77,13 @@ class MainRequester:
 
         except Exception as err:
             logger.exception(err)
+            bot.send_message(f'Main requester get Error Text: {str(err)}')
             bot.send_message(
                 f'\nMain requester get error type: {err.__class__.__name__}'
                 f'\nSupplier: {self.supplier}'
+                f'\nRequested data: {self.data.request_data.dict()}'
                 f'\nURL: {self.data.request_data.url}'
             )
-            bot.send_message(f'Main requester get Error Text: {str(err)}')
             self.output_data.message = 'Ошибка запроса к поставщику'
 
         self.output_data.errors.append({self.supplier: self.data.request_data})
