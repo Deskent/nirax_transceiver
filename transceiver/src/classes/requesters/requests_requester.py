@@ -19,7 +19,9 @@ class RequestsRequester(BaseRequester):
         self.payload.update(verify=self.ssl_verify)
         response: requests.Response = requests.request(**self.payload)
         status: int = response.status_code
-        if status in (200, 300):
+        if status == 204:
+            return {}
+        elif status in range(200, 300):
             return response.json()
         return {
             'status_code': status,

@@ -68,7 +68,9 @@ class AsyncRequester(BaseRequester):
                 async with session.request(**self.payload) as response:
                     status: int = response.status
                     answer_text: str = await response.text()
-                    if status in range(200, 300):
+                    if status == 204:
+                        return {}
+                    elif status in range(200, 300):
                         return await response.json()
                     return {
                         'status_code': status,
