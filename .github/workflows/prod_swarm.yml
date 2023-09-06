@@ -5,6 +5,7 @@ env:
   BRANCH: "main"
   VERSION: 'latest'
   WORKDIR: "transceiver"
+  REPOSITORY: "nirax"
 
 on:
   push:
