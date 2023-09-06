@@ -175,7 +175,7 @@ jobs:
 
           docker service update --image \
             ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
-            ${{ env.STACK }}_${{ env.PROJECT_NAME }};
+            ${{ env.STACK }}_${{ env.STACK }};
 
     - uses: actions/checkout@v3
 
