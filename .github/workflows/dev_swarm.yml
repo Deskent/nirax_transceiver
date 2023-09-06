@@ -6,6 +6,7 @@ env:
   BRANCH: "dev"
   VERSION: ${{ github.sha }}
   WORKDIR: "transceiver"
+  REPOSITORY: "nirax"
 
 on:
   push:
