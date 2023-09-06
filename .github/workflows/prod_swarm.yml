@@ -4,11 +4,7 @@ env:
   STAGE: "prod"
   BRANCH: "main"
   VERSION: 'latest'
-  REGISTRY_SERVER: "94.103.93.84:5055"
-  REPOSITORY: "nirax"
   WORKDIR: "transceiver"
-  SERVICE_NAME: "transceiver"
-  DEPLOY_PATH: "/home/nirax/projects"
 
 on:
   push:
@@ -173,15 +169,13 @@ jobs:
           docker pull \
           ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
 
-          cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
+          cd ${{ secrets.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
           git checkout ${{ env.BRANCH }}
           git pull
-          export $(cat .swarm.${{ env.STAGE }}.env)
-          docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.SERVICE_NAME }}_${{ env.STAGE }}
 
           docker service update --image \
-          ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
-          ${{ env.SERVICE_NAME }}_${{ env.STAGE }}_${{ env.SERVICE_NAME }}
+            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
+            ${{ env.STACK }}_${{ env.PROJECT_NAME }};
 
     - uses: actions/checkout@v3
 
