@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.9"
 
 services:
   transceiver:
@@ -8,7 +8,7 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     env_file:
-      - ./.swarm.dev.env
+      - ./.env
     volumes:
       - ./logs:/app/logs
     healthcheck:
@@ -18,7 +18,7 @@ services:
       start_period: 20s
       timeout: 10s
     deploy:
-      replicas: 1
+      replicas: 3
       update_config:
         parallelism: 1
         order: start-first
@@ -27,8 +27,5 @@ services:
       rollback_config:
         parallelism: 0
         order: stop-first
-      placement:
-        constraints:
-          - "node.labels.TAG==dev"
       restart_policy:
         condition: any

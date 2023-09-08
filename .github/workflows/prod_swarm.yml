@@ -4,17 +4,37 @@ env:
   STAGE: "prod"
   BRANCH: "main"
   VERSION: 'latest'
-  REGISTRY_SERVER: "94.103.93.84:5055"
-  REPOSITORY: "nirax"
   WORKDIR: "transceiver"
-  SERVICE_NAME: "transceiver"
-  DEPLOY_PATH: "/home/nirax/projects"
+  REPOSITORY: "nirax"
 
 on:
   push:
     branches: [ main ]
 
 jobs:
+  send_message:
+    name: Send message
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Send message using curl
+        env:
+          MESSAGE: "[${{ env.PROJECT_NAME}}]: Branch: ${{ env.BRANCH }}
+            \n${{ github.actor }} created commit with message:
+            \n${{ github.event.commits[0].message }}
+            \n\n${{ github.event.pull_request.body }}
+
+            \n\nRepository: ${{ github.repository }}
+            \nSee changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+            "
+        run: |
+          curl \
+          -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
   tests_backend:
     runs-on: ubuntu-latest
 
@@ -42,23 +62,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Send message using curl
-        env:
-          MESSAGE: "[${{ env.PROJECT_NAME}}]: Branch: ${{ env.BRANCH }}
-            \n${{ github.actor }} created commit with message:
-            \n${{ github.event.commits[0].message }}
-
-            \nRepository: ${{ github.repository }}
-
-            \nSee changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-            "
-        run: |
-          curl \
-          -X POST \
-          -H 'Content-Type: application/json' \
-          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
-          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -173,15 +176,13 @@ jobs:
           docker pull \
           ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
 
-          cd ${{ env.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
+          cd ${{ secrets.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
           git checkout ${{ env.BRANCH }}
           git pull
-          export $(cat .swarm.${{ env.STAGE }}.env)
-          docker stack deploy -c ./docker-swarm.${{ env.STAGE }}.yml ${{ env.SERVICE_NAME }}_${{ env.STAGE }}
 
           docker service update --image \
-          ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
-          ${{ env.SERVICE_NAME }}_${{ env.STAGE }}_${{ env.SERVICE_NAME }}
+            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
+            ${{ env.STACK }}_${{ env.STACK }};
 
     - uses: actions/checkout@v3
 
