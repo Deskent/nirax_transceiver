@@ -1,6 +1,7 @@
 name: transceiver-dev
 env:
   PROJECT_NAME: "nirax_transceiver"
+  STACK: "transceiver"
   STAGE: "prod"
   BRANCH: "main"
   VERSION: 'latest'
