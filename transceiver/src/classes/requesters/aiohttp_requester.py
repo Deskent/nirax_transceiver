@@ -71,7 +71,12 @@ class AsyncRequester(BaseRequester):
                     if status == 204:
                         return {}
                     elif status in range(200, 300):
-                        return await response.json()
+                        if response.content_type == 'application/json':
+                            data: JSON = await response.json()
+                        else:
+                            text: str = await response.text()
+                            data: JSON = json.loads(text)
+                        return data
                     return {
                         'status_code': status,
                         'text': answer_text
