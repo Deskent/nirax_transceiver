@@ -9,6 +9,7 @@ from src.classes.requesters.aiohttp_requester import AsyncRequester
 from src.classes.requesters.base_requester import BaseRequester
 from src.classes.requesters.requests_requester import RequestsRequester
 from src.classes.requesters.requests_session import RequestSession
+from src.classes.requesters.requests_soap import RequestsSoap
 from src.enums.enums import RequestTypes
 from src.exc.exceptions import DataRequestError
 from src.schemas.schemas import InputSchema, OutputSchema
@@ -30,6 +31,7 @@ class MainRequester:
             RequestTypes.aiohttp.value: AsyncRequester,
             RequestTypes.requests.value: RequestsRequester,
             RequestTypes.session.value: RequestSession,
+            RequestTypes.soap.value: RequestsSoap,
         }
         worker: Type[BaseRequester] = requests_types[self.data.request_type]
         try:
@@ -38,15 +40,15 @@ class MainRequester:
                 ssl_verify=self.data.ssl_verify,
                 create_form_data=self.data.create_form_data
             ).send_request()
+            if self.data.request_type != RequestTypes.soap.value:
+                if isinstance(answer, dict) and (status := answer.get('status_code')):
+                    self.output_data.status_code = status
+                    self.output_data.text = answer.get('text', '')
+                    self.output_data.message = (
+                        f'Ошибка запроса к поставщику {self.data.supplier}: Статус: {status}'
+                    )
 
-            if isinstance(answer, dict) and (status := answer.get('status_code')):
-                self.output_data.status_code = status
-                self.output_data.text = answer.get('text')
-                self.output_data.message = (
-                    f'Ошибка запроса к поставщику {self.data.supplier}: Статус: {status}'
-                )
-
-                return self.output_data
+                    return self.output_data
 
             self.output_data.data = answer if answer is not None else {}
             self.output_data.result = True
