@@ -75,7 +75,10 @@ class AsyncRequester(BaseRequester):
                             data: JSON = await response.json()
                         else:
                             text: str = await response.text()
-                            data: JSON = json.loads(text)
+                            if text:
+                                data: JSON = json.loads(text)
+                            else:
+                                data: JSON = {}
                         return data
                     return {
                         'status_code': status,
