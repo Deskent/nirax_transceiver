@@ -35,7 +35,7 @@ class MainRequester:
         }
         worker: Type[BaseRequester] = requests_types[self.data.request_type]
         try:
-            answer: dict | list = await worker(
+            answer: dict | list | str = await worker(
                 payload=payload,
                 ssl_verify=self.data.ssl_verify,
                 create_form_data=self.data.create_form_data
@@ -49,8 +49,11 @@ class MainRequester:
                     )
 
                     return self.output_data
+                elif isinstance(answer, str):
+                    self.output_data.data = {"transceiver_result": answer}
+                else:
+                    self.output_data.data = answer if answer is not None else {}
 
-            self.output_data.data = answer if answer is not None else {}
             self.output_data.result = True
 
             return self.output_data
