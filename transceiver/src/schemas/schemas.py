@@ -64,7 +64,7 @@ class OutputSchema(BaseModel):
 
         errors: list = []
 
-        data: list = []
+        data: list | dict = []
 
         status_code: int = 0
 
