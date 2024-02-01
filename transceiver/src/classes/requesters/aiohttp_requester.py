@@ -125,5 +125,9 @@ class AsyncRequester(BaseRequester):
             )
             raise DataRequestError(f'Invalid url: {self.payload["url"]}')
 
+        except TypeError as err:
+            logger.error(err)
+            raise DataRequestError(f'{err}')
+
     async def send_request(self):
         return await self._get_async_request_json()
