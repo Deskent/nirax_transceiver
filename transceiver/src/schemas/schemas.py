@@ -69,6 +69,8 @@ class OutputSchema(BaseModel):
         status_code: int = 0
 
         text: str = ''
+
+        uncheck: bool = False
     """
 
     result: bool = False
@@ -78,3 +80,4 @@ class OutputSchema(BaseModel):
     data: list | dict = {}
     status_code: int = 0
     text: str = ''
+    uncheck: bool = False
