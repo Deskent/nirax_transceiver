@@ -1,4 +1,5 @@
 import asyncio
+from json import JSONDecodeError
 from typing import Type
 
 import aiohttp.client_exceptions
@@ -67,7 +68,8 @@ class MainRequester:
                 aiohttp.client_exceptions.ClientPayloadError
         ) as err:
             logger.error(err)
-            self.output_data.message = f'Ошибка запроса к поставщику: Ошибка таймаута {self.timeout}'
+            self.output_data.message = (f'Ошибка запроса к поставщику: '
+                                        f'Ошибка таймаута {self.timeout}')
 
         except requests.exceptions.ConnectionError as err:
             logger.error(err)
@@ -78,7 +80,14 @@ class MainRequester:
                 aiohttp.client_exceptions.ServerDisconnectedError,
         )as err:
             logger.error(err)
-            self.output_data.message = 'Ошибка запроса к поставщику: слишком много запросов в данный момент'
+            self.output_data.message = ('Ошибка запроса к поставщику: '
+                                        'слишком много запросов в данный момент')
+
+        except JSONDecodeError as err:
+            logger.warning(err)
+            self.output_data.message = 'Ошибка ответа поставщика. Не удалось десериализовать ответ.'
+            if 'moskvorechie' in self.supplier:
+                self.output_data.uncheck = True
 
         except Exception as err:
             logger.exception(err)
