@@ -87,7 +87,7 @@ class MainRequester:
             logger.warning(err)
             self.output_data.message = 'Ошибка ответа поставщика. Не удалось десериализовать ответ.'
             if 'moskvorechie' in self.supplier:
-                self.output_data.data = {'uncheck': True}
+                self.output_data.uncheck = True
 
         except Exception as err:
             logger.exception(err)
