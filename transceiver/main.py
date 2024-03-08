@@ -10,6 +10,7 @@ from starlette.middleware.cors import CORSMiddleware
 from config import settings, logger
 from routers import main_router
 from _resources import __appname__, __version__
+from src.ws_router import connect_ws
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
@@ -54,6 +55,8 @@ def get_application():
     app.include_router(main_router)
 
     app: FastAPI = add_cors_middleware(app)
+
+    connect_ws(app)
 
     @app.on_event("startup")
     async def on_startup():

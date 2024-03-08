@@ -1,0 +1,11 @@
+# Test your FastAPI endpoints
+###
+POST http://127.0.0.1:8005/ws/send_json
+Accept: application/json
+Content-Type: application/json
+
+{
+    "message": "test message"
+}
+
+###
