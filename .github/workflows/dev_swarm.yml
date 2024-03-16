@@ -41,7 +41,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: [ "3.10" ]
 
     services:
       redis:
@@ -165,54 +165,54 @@ jobs:
   deploy:
     name: Deploy and report
     runs-on: ubuntu-latest
-    needs: [building, tests_backend]
+    needs: [ building, tests_backend ]
     steps:
-    - name: Deploy code to remote server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST_PROD }}
-        username: ${{ secrets.USERNAME_PROD }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
-        script: |
-          docker pull \
-          ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
+      - name: Deploy code to remote server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ${{ secrets.USERNAME_PROD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
+          script: |
+            docker pull \
+            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
 
-          cd ${{ secrets.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
-          git checkout ${{ env.BRANCH }}
-          git pull
+            cd ${{ secrets.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
+            git checkout ${{ env.BRANCH }}
+            git pull
 
-          docker service update --image \
-            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
-            ${{ env.STACK }}_${{ env.STACK }};
+            docker service update --image \
+              ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
+              ${{ env.STACK }}_${{ env.STACK }};
 
 
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Telegram notification on Failure
-      if: failure()
-      env:
-        MESSAGE: "
+      - name: Telegram notification on Failure
+        if: failure()
+        env:
+          MESSAGE: "
           Deploy: FAILED!!!
           \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
           \nVersion: ${{ env.VERSION}}
           "
-      run: |
-        curl \
-        -X POST \
-        -H 'Content-Type: application/json' \
-        -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": false}' \
-        https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+        run: |
+          curl \
+          -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": false}' \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
 
-    - name: Send notification on Success
-      env:
-        MESSAGE: "
+      - name: Send notification on Success
+        env:
+          MESSAGE: "
           Deploy: OK
           \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
           \nVersion: ${{ env.VERSION}}
           "
-      run: |
-        curl \
-        -X POST \
-        -H 'Content-Type: application/json' \
-        -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
-        https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+        run: |
+          curl \
+          -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
