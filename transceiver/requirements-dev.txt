@@ -1,0 +1,15 @@
+-r requirements.txt
+# Testing
+pytest-asyncio==0.21.1  # NO UPDATE! Back compatibility broken!
+
+# # Linters
+ruff==0.2.1
+black==24.1.1
+flake8==7.0.0
+isort==5.13.2
+flake8-cognitive-complexity==0.1.0  # Check cognitive functions complexity
+flake8-functions==0.0.8  # Count agruments of functions, max=6
+flake8-variables-names==0.0.6  # Check variables names not in black list (a, foo)
+
+# # Deploy
+pre-commit==3.6.1

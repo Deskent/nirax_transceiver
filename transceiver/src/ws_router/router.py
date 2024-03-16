@@ -1,50 +1,42 @@
 from typing import Annotated
 
+from config import logger
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
-
 from .manager import ConnectionManager
+from ..schemas.value_objects import ActionDTO
 
 router = APIRouter(prefix='/ws', tags=['Websocket'])
+
+
+@router.get('/info')
+async def info():
+    return {'version': ''}
 
 
 @router.websocket("/json/{client_id}")
 async def websocket_json_endpoint(
     websocket: WebSocket,
-    client_id: int,
+    client_id: str,
     manager: Annotated[ConnectionManager, Depends()],
 ):
-    await manager.connect(websocket)
-    await manager.broadcast_json({"message": f"Client #{client_id} join the chat"})
+    await websocket.accept()
+    # await manager.connect(websocket)
     try:
+        if client_id != 'nirax_websocket_id':
+            raise WebSocketDisconnect
+
         while True:
-            json_data: dict | list = await manager.receive_json(websocket)
-            await manager.send_personal_json(websocket, json_data)
+            try:
+                data: dict = await websocket.receive_json()
+                dto = ActionDTO(**data)
+                await websocket.send_json(dto.dict())
+            except Exception as err:
+                logger.exception(err)
+                raise WebSocketDisconnect
+
     except WebSocketDisconnect:
-        await manager.disconnect(websocket)
-        await manager.broadcast_json({"message": f"Client #{client_id} left the chat"})
+        await websocket.close()
 
-
-@router.websocket("/text/{client_id}")
-async def websocket_text_endpoint(
-    websocket: WebSocket,
-    client_id: int,
-    manager: Annotated[ConnectionManager, Depends()],
-):
-    await manager.connect(websocket)
-    await manager.broadcast_json({"message": f"Client #{client_id} join the chat"})
-    try:
-        while True:
-            data: str = await manager.receive_text(websocket)
-            await manager.broadcast_message(f"Client #{client_id} says: {data}")
-    except WebSocketDisconnect:
-        await manager.disconnect(websocket)
-        await manager.broadcast_json({"message": f"Client #{client_id} left the chat"})
-
-
-# For testing in Swagger
-@router.post('/send_json')
-async def send_mailing(
-    payload: dict,
-    manager: Annotated[ConnectionManager, Depends()],
-):
-    await manager.broadcast_json(payload)
+    except Exception as err:
+        logger.exception(err)
+        await websocket.close()

@@ -56,6 +56,7 @@ class ConnectionManager(Singleton):
 
         if websocket in cls._active_connections:
             cls._active_connections.remove(websocket)
+        await websocket.close()
 
     @classmethod
     async def send_personal_message(cls, websocket: WebSocket, message: str) -> None:
