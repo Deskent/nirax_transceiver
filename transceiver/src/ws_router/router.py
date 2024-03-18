@@ -1,9 +1,10 @@
 from typing import Annotated
 
-from config import logger
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
-from .manager import ConnectionManager
-from ..schemas.value_objects import ActionDTO
+
+from config import logger
+from .manager import ConnectionManager, get_ws_manager
+from ..schemas.actions import Action
 
 router = APIRouter(prefix='/ws', tags=['Websocket'])
 
@@ -13,30 +14,30 @@ async def info():
     return {'version': ''}
 
 
+@router.get('/actions')
+async def get_all_actions():
+    return Action.values()
+
+
 @router.websocket("/json/{client_id}")
 async def websocket_json_endpoint(
     websocket: WebSocket,
     client_id: str,
-    manager: Annotated[ConnectionManager, Depends()],
+    manager: Annotated[ConnectionManager, Depends(get_ws_manager)],
 ):
-    await websocket.accept()
-    # await manager.connect(websocket)
     try:
-        if client_id != 'nirax_websocket_id':
-            raise WebSocketDisconnect
+        await manager.connect(websocket, client_id)
 
         while True:
             try:
-                data: dict = await websocket.receive_json()
-                dto = ActionDTO(**data)
-                await websocket.send_json(dto.dict())
+                await manager.handle_json(websocket)
             except Exception as err:
                 logger.exception(err)
                 raise WebSocketDisconnect
 
     except WebSocketDisconnect:
-        await websocket.close()
+        await manager.disconnect(websocket)
 
     except Exception as err:
         logger.exception(err)
-        await websocket.close()
+        await manager.disconnect(websocket)

@@ -22,3 +22,4 @@ class BaseStrEnum(str, BaseEnum):
 
 class Action(BaseStrEnum):
     echo: str = 'echo'
+    execute: str = 'execute'

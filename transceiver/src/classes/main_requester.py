@@ -39,7 +39,7 @@ class MainRequester:
             answer: dict | list | str = await worker(
                 payload=payload,
                 ssl_verify=self.data.ssl_verify,
-                create_form_data=self.data.create_form_data
+                create_form_data=self.data.create_form_data,
             ).send_request()
             if self.data.request_type != RequestTypes.soap.value:
                 if isinstance(answer, dict) and (status := answer.get('status_code')):
@@ -64,24 +64,26 @@ class MainRequester:
             self.output_data.message = f'{err}'
 
         except (
-                asyncio.exceptions.TimeoutError,
-                aiohttp.client_exceptions.ClientPayloadError
+            asyncio.exceptions.TimeoutError,
+            aiohttp.client_exceptions.ClientPayloadError,
         ) as err:
             logger.error(err)
-            self.output_data.message = (f'Ошибка запроса к поставщику: '
-                                        f'Ошибка таймаута {self.timeout}')
+            self.output_data.message = (
+                f'Ошибка запроса к поставщику: ' f'Ошибка таймаута {self.timeout}'
+            )
 
         except requests.exceptions.ConnectionError as err:
             logger.error(err)
             self.output_data.message = 'Ошибка запроса к поставщику: Ошибка подключения'
 
         except (
-                aiohttp.client_exceptions.ClientConnectorError,
-                aiohttp.client_exceptions.ServerDisconnectedError,
-        )as err:
+            aiohttp.client_exceptions.ClientConnectorError,
+            aiohttp.client_exceptions.ServerDisconnectedError,
+        ) as err:
             logger.error(err)
-            self.output_data.message = ('Ошибка запроса к поставщику: '
-                                        'слишком много запросов в данный момент')
+            self.output_data.message = (
+                'Ошибка запроса к поставщику: ' 'слишком много запросов в данный момент'
+            )
 
         except JSONDecodeError as err:
             logger.warning(err)
@@ -102,3 +104,21 @@ class MainRequester:
 
         self.output_data.errors.append({self.supplier: self.data.request_data})
         return self.output_data
+
+
+async def handle_request(data: InputSchema) -> OutputSchema:
+    logger.debug(data)
+    try:
+        results = await MainRequester(data).run_request()
+        logger.debug(results)
+        return results
+    except asyncio.exceptions.TimeoutError as err:
+        logger.error(err)
+        return OutputSchema(
+            message=f'Ошибка запроса к поставщику: Ошибка таймаута: {data.request_data.timeout}'
+        )
+
+    except Exception as err:
+        logger.exception(err)
+
+    return OutputSchema(message='Ошибка запроса к поставщику: общая')

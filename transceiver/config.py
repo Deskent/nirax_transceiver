@@ -1,8 +1,8 @@
 import datetime
 import sys
 from pathlib import Path
-from loguru import logger
 
+from loguru import logger
 from pydantic import BaseSettings
 
 
@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     STAGE: str = ""
     LOGGER_LEVEL: str = "INFO"
     DEFAULT_TIMEOUT: int = 60
+    SECRET_HEADER: str = 'nirax_websocket_id'
 
     class Config:
         env_file = '/.env'

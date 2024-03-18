@@ -1,4 +1,5 @@
 import pytest
+
 URL = '/resend'
 
 
@@ -45,7 +46,7 @@ def test_requests_route_ok(tclient, base_url, payload_requests):
 @pytest.mark.local
 @pytest.mark.server
 def test_requests_route_bad_url(tclient, base_url, payload_requests):
-    payload_requests['request_data']['url'] = 'blable'
+    payload_requests['request_data']['url'] = 'wrong_url'
     response = tclient.post(base_url + URL, json=payload_requests)
     assert response.status_code == 200
     data: dict = response.json()

@@ -4,7 +4,7 @@ from typing import Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+
 from main import app
 from src.enums.enums import RequestTypes
 from tests.conftest import URL_TEST
@@ -72,13 +72,6 @@ def host_test() -> str:
     return host_test
 
 
-@pytest.fixture
-def tclient() -> TestClient:
-    client = TestClient(app=app)
-    with client as session:
-        yield session
-
-
 @pytest.fixture(scope='session')
 def base_url() -> str:
     return "/api/transceiver"
@@ -94,15 +87,11 @@ def event_loop():
 
 
 @pytest.fixture(scope='session')
-async def atclient(base_url: str) -> Generator[AsyncClient, None, None]:
-    client: AsyncClient = AsyncClient(
-        app=app,
-        base_url=base_url,
-        follow_redirects=True,
-    )
-    yield client
-
-
-@pytest.fixture(scope='session')
-async def websocket_client(base_url: str) -> Generator[TestClient, None, None]:
+async def testclient(base_url: str) -> Generator[TestClient, None, None]:
     yield TestClient(app)
+
+
+@pytest.fixture
+def tclient(testclient: TestClient) -> TestClient:
+    with testclient as session:
+        yield session

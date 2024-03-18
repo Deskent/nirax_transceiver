@@ -1,4 +1,9 @@
-from fastapi.websockets import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
+
+from config import settings
+from src.classes.main_requester import handle_request
+from src.schemas.schemas import InputSchema, OutputSchema
+from src.schemas.value_objects import ActionDTO
 
 
 class Singleton:
@@ -44,8 +49,11 @@ class ConnectionManager(Singleton):
         return len(self._active_connections)
 
     @classmethod
-    async def connect(cls, websocket: WebSocket) -> None:
+    async def connect(cls, websocket: WebSocket, client_id: str) -> None:
         """Add new connection to connections list."""
+
+        if client_id != settings.SECRET_HEADER:
+            raise WebSocketDisconnect
 
         await websocket.accept()
         cls._active_connections.append(websocket)
@@ -100,13 +108,15 @@ class ConnectionManager(Singleton):
     async def receive_json(cls, websocket: WebSocket) -> dict | list:
         """Returns received message as JSON, handle errors."""
 
-        text: str = 'Invalid JSON'
-        try:
-            return await websocket.receive_json()
-        except Exception as err:
-            print(err)
+        return await websocket.receive_json()
 
-        return {'error': text}
+    async def handle_json(self, websocket: WebSocket) -> None:
+        received_data: dict = await self.receive_json(websocket)
+        if received_data:
+            dto = ActionDTO(**received_data)
+            payload = InputSchema(**dto.payload)
+            result: OutputSchema = await handle_request(payload)
+            await self.send_personal_json(websocket, result.dict())
 
 
 def get_ws_manager() -> ConnectionManager:
