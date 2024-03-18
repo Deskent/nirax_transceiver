@@ -1,6 +1,6 @@
 from fastapi import WebSocket, WebSocketDisconnect
 
-from config import settings
+from config import settings, logger
 from src.classes.main_requester import handle_request
 from src.schemas.schemas import InputSchema, OutputSchema
 from src.schemas.value_objects import ActionDTO
@@ -64,7 +64,10 @@ class ConnectionManager(Singleton):
 
         if websocket in cls._active_connections:
             cls._active_connections.remove(websocket)
-        await websocket.close()
+        try:
+            await websocket.close()
+        except Exception as err:
+            logger.warning(err)
 
     @classmethod
     async def send_personal_message(cls, websocket: WebSocket, message: str) -> None:

@@ -25,12 +25,15 @@ async def websocket_json_endpoint(
     client_id: str,
     manager: Annotated[ConnectionManager, Depends(get_ws_manager)],
 ):
+    logger.debug(f"Client ID: {client_id}. Websocket {websocket}")
     try:
         await manager.connect(websocket, client_id)
 
         while True:
             try:
                 await manager.handle_json(websocket)
+            except WebSocketDisconnect:
+                raise
             except Exception as err:
                 logger.exception(err)
                 raise WebSocketDisconnect
