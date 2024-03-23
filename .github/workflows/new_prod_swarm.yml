@@ -176,8 +176,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD_NEW }}
           script: |
             cd ${{ env.INFRA_WORKDIR }}
-            git pull
-            source ./update_backend.sh ${{ env.VERSION }}
+      #            git pull
+      #            source ./update_backend.sh ${{ env.VERSION }}
       #            docker pull \
       #            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
       #
