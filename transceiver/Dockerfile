@@ -4,8 +4,6 @@ RUN apk --update --no-cache add curl
 
 RUN python3 -m pip install --no-cache-dir --upgrade pip
 
-FROM builder
-
 WORKDIR /app
 
 COPY requirements.txt .
