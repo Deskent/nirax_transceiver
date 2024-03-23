@@ -218,11 +218,11 @@ jobs:
           https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
 
   deploy_new:
-    name: Deploy and report
+    name: Deploy and report to NEW server
     runs-on: ubuntu-latest
     needs: [ deploy ]
     steps:
-      - name: Deploy code to remote server
+      - name: Deploy code to NEW remote server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST_PROD_NEW }}
@@ -239,7 +239,7 @@ jobs:
         if: failure()
         env:
           MESSAGE: "
-          Deploy: FAILED!!!
+          Deploy NEW: FAILED!!!
           \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
           \nVersion: ${{ env.VERSION}}
           "
@@ -253,7 +253,7 @@ jobs:
       - name: Send notification on Success
         env:
           MESSAGE: "
-          Deploy: OK
+          Deploy NEW: OK
           \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
           \nVersion: ${{ env.VERSION}}
           "
