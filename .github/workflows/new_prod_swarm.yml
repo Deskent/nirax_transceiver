@@ -175,7 +175,7 @@ jobs:
           username: ${{ secrets.USERNAME_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD_NEW }}
           script: |
-            cd ${{ INFRA_WORKDIR }} && \
+            cd ${{ env.INFRA_WORKDIR }} && \
             git pull && \
             . ./update_backend.sh ${{ VERSION }}
       #            docker pull \
