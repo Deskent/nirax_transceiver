@@ -8,7 +8,7 @@ env:
   VERSION: ${{ github.sha }}
   WORKDIR: "transceiver"
   REPOSITORY: "nirax"
-  INFRA_WORKDIR: "/home/nirax/infra/nirax_transceiver"
+  INFRA_WORKDIR: "/home/nirax/infra/nirax_infra/nirax_transceiver"
 
 on:
   push:
