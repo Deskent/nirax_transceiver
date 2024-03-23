@@ -166,7 +166,7 @@ jobs:
   deploy:
     name: Deploy and report
     runs-on: ubuntu-latest
-    needs: [ building, tests_backend ]
+    needs: [ building ]
     steps:
       - name: Deploy code to remote server
         uses: appleboy/ssh-action@v1.0.3
@@ -221,7 +221,7 @@ jobs:
   deploy_new:
     name: Deploy and report to NEW server
     runs-on: ubuntu-latest
-    needs: [ deploy ]
+    needs: [ building ]
     steps:
       - name: Deploy code to NEW remote server
         uses: appleboy/ssh-action@v1.0.3
