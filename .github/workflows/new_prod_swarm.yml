@@ -177,7 +177,7 @@ jobs:
           script: |
             cd ${{ env.INFRA_WORKDIR }} && \
             git pull && \
-            . ./update_backend.sh ${{ VERSION }}
+            . ./update_backend.sh ${{ env.VERSION }}
       #            docker pull \
       #            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
       #
