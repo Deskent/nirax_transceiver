@@ -4,14 +4,15 @@ env:
   STACK: "transceiver"
   STAGE: "prod"
   BRANCH: "main"
-  VERSION: "latest"
+  #  VERSION: "latest"
+  VERSION: ${{ github.sha }}
   WORKDIR: "transceiver"
   REPOSITORY: "nirax"
   INFRA_WORKDIR: "/home/nirax/infra/nirax_infra/nirax_transceiver"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ deskent1 ]
 
 jobs:
   send_message:
@@ -19,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Send message using curl
         env:
           MESSAGE: "[${{ env.PROJECT_NAME}}]: Branch: ${{ env.BRANCH }}
@@ -166,61 +166,7 @@ jobs:
   deploy:
     name: Deploy and report
     runs-on: ubuntu-latest
-    needs: [ building, tests_backend ]
-    steps:
-      - name: Deploy code to remote server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_PROD }}
-          username: ${{ secrets.USERNAME_PROD }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
-          script: |
-            docker pull \
-            ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}}
-
-            cd ${{ secrets.DEPLOY_PATH }}/${{ env.PROJECT_NAME }}
-            git checkout ${{ env.BRANCH }}
-            git pull
-
-            docker service update --image \
-              ${{ secrets.REGISTRY_SERVER }}/${{ env.REPOSITORY }}/${{ env.PROJECT_NAME }}:${{ env.VERSION}} \
-              ${{ env.STACK }}_${{ env.STACK }};
-
-      - uses: actions/checkout@v3
-
-      - name: Telegram notification on Failure
-        if: failure()
-        env:
-          MESSAGE: "
-          Deploy: FAILED!!!
-          \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
-          \nVersion: ${{ env.VERSION}}
-          "
-        run: |
-          curl \
-          -X POST \
-          -H 'Content-Type: application/json' \
-          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": false}' \
-          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
-
-      - name: Send notification on Success
-        env:
-          MESSAGE: "
-          Deploy: OK
-          \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
-          \nVersion: ${{ env.VERSION}}
-          "
-        run: |
-          curl \
-          -X POST \
-          -H 'Content-Type: application/json' \
-          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
-          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
-
-  deploy_new:
-    name: Deploy and report
-    runs-on: ubuntu-latest
-    needs: [ deploy ]
+    needs: [ building ]
     steps:
       - name: Deploy code to remote server
         uses: appleboy/ssh-action@v1.0.3

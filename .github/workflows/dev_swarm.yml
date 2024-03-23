@@ -7,6 +7,7 @@ env:
   VERSION: ${{ github.sha }}
   WORKDIR: "transceiver"
   REPOSITORY: "nirax"
+  INFRA_WORKDIR: "/home/nirax/infra/nirax_infra/nirax_transceiver"
 
 on:
   push:
@@ -188,6 +189,53 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Telegram notification on Failure
+        if: failure()
+        env:
+          MESSAGE: "
+          Deploy: FAILED!!!
+          \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
+          \nVersion: ${{ env.VERSION}}
+          "
+        run: |
+          curl \
+          -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": false}' \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+      - name: Send notification on Success
+        env:
+          MESSAGE: "
+          Deploy: OK
+          \n[${{ env.PROJECT_NAME}}]: Branch ${{ env.BRANCH }}:
+          \nVersion: ${{ env.VERSION}}
+          "
+        run: |
+          curl \
+          -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": ${{ secrets.TELEGRAM_CHAT_ID }}, "text": "${{ env.MESSAGE }}", "disable_notification": true}' \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+  deploy_new:
+    name: Deploy and report
+    runs-on: ubuntu-latest
+    needs: [ deploy ]
+    steps:
+      - name: Deploy code to remote server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_PROD_NEW }}
+          username: ${{ secrets.USERNAME_PROD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_PROD_NEW }}
+          port: 22
+          script: |
+            cd ${{ env.INFRA_WORKDIR }}
+            git pull
+            source ./update_backend.sh ${{ env.VERSION }}
+
+      - uses: actions/checkout@v3
       - name: Telegram notification on Failure
         if: failure()
         env:
